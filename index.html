@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector de Concentración por Cámara</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            color: #333;
+            margin-top: 30px;
+        }
+        video, canvas {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin-top: 10px;
+            max-width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Medidor de Concentración con Cámara</h2>
+    <p>Visualiza tu rostro en tiempo real para evaluar el enfoque.</p>
+
+    <!-- Elemento de video para mostrar la cámara -->
+    <div>
+        <video id="camara" autoplay playsinline width="400" height="300"></video>
+    </div>
+
+    <!-- Botón para capturar y analizar -->
+    <div>
+        <button id="capturar">Analizar Concentración</button>
+    </div>
+
+    <!-- Lienzo oculto para procesar la imagen capturada -->
+    <canvas id="lienzo" width="400" height="300" style="display:none;"></canvas>
+
+    <!-- Área de resultados y sugerencias -->
+    <div id="resultado"></div>
+
+    <script>
+        const video = document.getElementById('camara');
+        const canvas = document.getElementById('lienzo');
+        const boton = document.getElementById('capturar');
+        const resultadoDiv = document.getElementById('resultado');
+
+        // 1. Acceder a la cámara del dispositivo
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                console.error("No se pudo acceder a la cámara:", error);
+                resultadoDiv.innerText = "Error: No se pudo acceder a la cámara del dispositivo.";
+            });
+
+        // 2. Capturar la foto al hacer clic en el botón
+        boton.addEventListener('click', () => {
+            const contexto = canvas.getContext('2d');
+            
+            // Dibujar el fotograma actual del video en el lienzo oculto
+            contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Simulación de análisis (Aquí es donde entraría una librería como face-api.js o TensorFlow.js)
+            resultadoDiv.innerText = "Analizando postura y microgestos...";
+
+            setTimeout(() => {
+                // Ejemplo de lectura simulada
+                const estados = [
+                    { nivel: "Alto (Enfoque profundo)", sugerencia: "¡Excelente ritmo! Mantén la postura actual." },
+                    { nivel: "Moderado", sugerencia: "Tiendes a tensar el ceño. Relaja la mandíbula y respira hondo." },
+                    { nivel: "Bajo (Distracción detectada)", sugerencia: "Se detecta fatiga o dispersión. Toma un respiro de 5 segundos." }
+                ];
+
+                // Elegir un estado aleatorio para demostración
+                const aleatorio = estados[Math.floor(Math.random() * estados.length)];
+
+                resultadoDiv.innerHTML = `Grado de concentración: <strong>${aleatorio.nivel}</strong><br>
+                                          <em>Sugerencia:</em> ${aleatorio.sugerencia}`;
+            }, 1000);
+        });
+    </script>
+
+</body>
+</html>
